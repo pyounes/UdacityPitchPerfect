@@ -18,8 +18,9 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        stopRecordingButton.isEnabled = false
+
+//        stopRecordingButton.isEnabled = false
+        isRecording(false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -28,9 +29,9 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
     }
 
     @IBAction func recordAudio(_ sender: UIButton) {
-        recordingLabel.text = "Recording in Progress..."
-        stopRecordingButton.isEnabled = true
-        recordButton.isEnabled = false
+        
+        
+        isRecording(true)
         
         let dirPath = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask, true)[0] as String
         let recordingName = "recordedVoice.wav"
@@ -49,9 +50,8 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     @IBAction func stopRecording(_ sender: UIButton) {
-        recordingLabel.text = "Tap to Record"
-        stopRecordingButton.isEnabled = false
-        recordButton.isEnabled = true
+        
+        isRecording(false)
         
         audioRecorder.stop()
         let audioSession = AVAudioSession.sharedInstance()
@@ -61,7 +61,7 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
 
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         if flag {
-            performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
+            performSegue(withIdentifier: Constants.Segues.stopRecording, sender: audioRecorder.url)
         } else {
             print("Recording Failed")
         }
@@ -73,6 +73,13 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
             let recordedAudioURL = sender as! URL
             playSoundsVC.recordedAudioURL = recordedAudioURL
         }
+    }
+    
+    private func isRecording(_ flag: Bool) {
+        stopRecordingButton.isEnabled = flag
+        recordButton.isEnabled = !flag
+        
+        recordingLabel.text = flag ? Constants.LabelText.recordingInProgress : Constants.LabelText.tapToRecord
     }
 }
 
